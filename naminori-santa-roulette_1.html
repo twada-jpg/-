@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>波乗りサンタ★サマールーレット</title>
+<style>
+  :root{
+    --sky-top:#aef0ff;
+    --sky-bottom:#1fb6d8;
+    --sea-deep:#0077a8;
+    --sea-mid:#00a8cc;
+    --sand:#f6e3b8;
+    --sand-dark:#e6c887;
+    --coral:#ff5a5f;
+    --coral-dark:#e0414b;
+    --mango:#ff9f1c;
+    --ink:#0a3d52;
+    --ink-soft:#1f6b85;
+    --gold:#ffcf4d;
+    --paper:#fffdf6;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    background:
+      radial-gradient(120% 80% at 50% -10%, var(--sky-top) 0%, var(--sky-bottom) 45%, var(--sea-mid) 75%, var(--sea-deep) 100%);
+    overflow-x:hidden;
+  }
+  /* ゆれる太陽の光 */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(closest-side at 82% 14%, rgba(255,233,150,.55), rgba(255,233,150,0) 70%);
+  }
+
+  .wrap{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:18px 18px 60px;}
+
+  header.hero{text-align:center;color:#fff;padding:6px 0 14px;}
+  header.hero .eyebrow{
+    font-weight:700;letter-spacing:.35em;font-size:13px;
+    text-transform:uppercase;color:#fff8e1;opacity:.95;margin-bottom:4px;
+  }
+  header.hero h1{
+    margin:0;font-size:clamp(26px,4.4vw,46px);line-height:1.05;
+    text-shadow:0 3px 0 var(--coral-dark),0 6px 14px rgba(0,40,60,.35);
+    letter-spacing:.01em;
+  }
+  header.hero h1 .swing{color:var(--gold);display:inline-block;}
+  header.hero p.sub{margin:8px 0 0;font-weight:600;opacity:.95;text-shadow:0 1px 3px rgba(0,40,60,.4)}
+
+  .layout{display:flex;gap:22px;align-items:flex-start;margin-top:10px;}
+  @media (max-width:980px){ .layout{flex-direction:column-reverse;align-items:center;} }
+
+  /* ===== 設定パネル ===== */
+  .panel{
+    flex:0 0 340px;width:340px;
+    background:var(--paper);
+    border-radius:22px;
+    padding:18px 18px 22px;
+    box-shadow:0 14px 32px rgba(0,40,60,.28);
+    border:3px solid #fff;
+  }
+  @media (max-width:980px){ .panel{width:100%;max-width:560px;flex-basis:auto;} }
+
+  .panel h2{
+    margin:2px 0 12px;font-size:18px;color:var(--ink);
+    display:flex;align-items:center;gap:8px;
+  }
+  .panel h2 .dot{width:10px;height:10px;border-radius:50%;background:var(--coral)}
+
+  .mode-toggle{display:flex;gap:6px;margin-bottom:16px;}
+  .mode-toggle.four{flex-wrap:wrap;}
+  .mode-toggle.four .mode-btn{flex:1 1 calc(50% - 3px);font-size:14px;padding:9px 4px;}
+  .mode-btn{
+    flex:1;min-width:0;border:0;cursor:pointer;border-radius:14px;padding:11px 4px;
+    font-weight:800;font-size:15px;color:var(--ink-soft);white-space:nowrap;
+    background:#e9f6fb;border:2px solid #d4ecf4;transition:transform .12s, box-shadow .12s;
+  }
+  .mode-btn .label{display:block;font-size:11px;font-weight:700;opacity:.7;margin-top:2px}
+  .mode-btn.active{
+    color:#fff;background:linear-gradient(180deg,var(--coral),var(--coral-dark));
+    border-color:#fff;box-shadow:0 6px 16px rgba(224,65,75,.4);
+  }
+  .mode-btn:active{transform:scale(.97)}
+
+  /* 賞品カード */
+  .prize-card{background:linear-gradient(180deg,#fff7e6,#fff0d0);border:2px solid #ffe1a8;border-radius:16px;
+    padding:12px;margin-bottom:16px;box-shadow:0 6px 14px rgba(255,180,60,.18);}
+  .prize-card .pc-head{font-weight:900;font-size:13px;color:#a86b00;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .prize-item{display:flex;align-items:center;gap:10px;padding:6px 0;}
+  .prize-item + .prize-item{border-top:1px dashed #f0d59a;}
+  .prize-img{flex:0 0 auto;border-radius:10px;overflow:hidden;background:#fff;border:2px solid #ffe1a8;display:flex;align-items:center;justify-content:center;}
+  .prize-img.sm{width:52px;height:52px;} .prize-img.md{width:84px;height:84px;} .prize-img.lg{width:120px;height:120px;}
+  .prize-img.xs{width:28px;height:28px;border-width:1px;border-radius:7px;}
+  .prize-img svg{width:100%;height:100%;display:block;}
+  .prize-img img{width:100%;height:100%;object-fit:contain;display:block;}
+  .prize-meta{flex:1;min-width:0;}
+  .prize-name{font-weight:800;font-size:14px;color:var(--ink);line-height:1.25;}
+  .prize-qty{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--coral);border-radius:999px;padding:1px 8px;margin-left:4px;vertical-align:middle;}
+  .prize-link{font-size:11px;color:#1f8fb0;text-decoration:none;font-weight:700;}
+  .prize-link:hover{text-decoration:underline;}
+
+  .prize-urls{margin-bottom:14px;font-size:12px;color:var(--ink-soft);}
+  .prize-urls summary{cursor:pointer;font-weight:700;padding:6px 0;}
+  .prize-urls .pu-row{display:flex;flex-direction:column;gap:3px;margin:8px 0;}
+  .prize-urls .pu-row label{font-size:11px;font-weight:700;color:var(--ink-soft);}
+  .prize-urls .pu-row input{padding:7px 9px;border-radius:9px;border:2px solid #d4ecf4;font-size:12px;font-family:inherit;}
+
+  /* 今回の賞品バナー */
+  .prize-banner{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 12px;min-height:60px;
+    background:rgba(255,255,255,.92);border-radius:16px;padding:8px 18px;box-shadow:0 6px 16px rgba(0,40,60,.2);border:2px solid #fff;}
+  .prize-banner .pb-label{font-weight:900;font-size:12px;color:#a86b00;}
+  .prize-banner .pb-name{font-weight:900;font-size:clamp(15px,2vw,19px);color:var(--ink);}
+  .prize-banner.done{background:rgba(255,255,255,.6);}
+
+  /* モーダル賞品 */
+  .modal-prize{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:12px;}
+  .modal-prize .mp-name{font-weight:900;font-size:clamp(16px,3.4vw,22px);color:#a86b00;}
+  .modal-prize .prize-img{box-shadow:0 8px 20px rgba(255,180,60,.4);}
+
+  .field{margin-bottom:14px}
+  .field label{display:block;font-weight:700;font-size:13px;color:var(--ink-soft);margin-bottom:5px}
+  .field input{
+    width:100%;padding:10px 12px;border-radius:12px;border:2px solid #d4ecf4;
+    font-size:15px;font-family:inherit;background:#fbfeff;color:var(--ink);
+  }
+  .field input:focus{outline:none;border-color:var(--mango);box-shadow:0 0 0 3px rgba(255,159,28,.2)}
+  .field .hint{font-size:11px;color:#7fa6b4;margin-top:4px}
+
+  .members{
+    border:2px dashed #bfe2ee;border-radius:14px;padding:10px;background:#f4fbfd;
+    max-height:300px;overflow-y:auto;
+  }
+  .member-row{display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap}
+  .member-row:last-child{margin-bottom:0}
+  .member-row .num{
+    flex:0 0 24px;text-align:center;font-weight:800;color:#8fb9c6;font-size:13px;
+  }
+  .member-row input{
+    flex:1;min-width:90px;padding:8px 10px;border-radius:10px;border:2px solid #d4ecf4;
+    font-size:14px;font-family:inherit;background:#fff;
+  }
+  .member-row input:focus{outline:none;border-color:var(--mango)}
+  .member-row.won input{background:#f2f7f9;color:#7e98a2;border-color:#e1edf2;border-style:dashed;cursor:default}
+  .won-badge{
+    flex:0 0 auto;font-size:11px;font-weight:800;color:#7a5a00;white-space:nowrap;
+    background:linear-gradient(180deg,#ffe49a,#ffcf4d);
+    border:1px solid #f0c64a;border-radius:999px;padding:3px 9px;
+    box-shadow:0 2px 5px rgba(240,198,74,.4);
+  }
+  .icon-btn{
+    flex:0 0 34px;height:34px;border:0;border-radius:10px;cursor:pointer;
+    font-weight:900;font-size:18px;line-height:1;color:#fff;background:#ff8a8a;
+    transition:transform .1s;
+  }
+  .icon-btn:hover{background:#ff6b6b}
+  .icon-btn:active{transform:scale(.9)}
+
+  .add-btn{
+    width:100%;margin-top:10px;border:0;border-radius:12px;cursor:pointer;
+    padding:10px;font-weight:800;font-size:15px;color:#fff;
+    background:linear-gradient(180deg,#2bcbba,#0fa99b);
+    box-shadow:0 5px 14px rgba(15,169,155,.35);transition:transform .1s;
+  }
+  .add-btn:active{transform:scale(.98)}
+  .count-line{font-size:12px;color:#7fa6b4;margin-top:8px;text-align:right}
+
+  .sound-row{display:flex;gap:8px;margin-top:16px}
+  .toggle-btn{
+    flex:1;border:2px solid #d4ecf4;border-radius:12px;background:#fff;cursor:pointer;
+    padding:9px;font-weight:700;font-size:13px;color:var(--ink-soft);display:flex;
+    align-items:center;justify-content:center;gap:6px;transition:.12s;
+  }
+  .toggle-btn.on{background:linear-gradient(180deg,#ffe49a,#ffcf4d);border-color:#fff;color:#7a5a00}
+  .toggle-btn:active{transform:scale(.97)}
+
+  /* ===== ステージ ===== */
+  .stage{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;}
+  .award-title{
+    color:#fff;font-weight:900;font-size:clamp(20px,3vw,30px);margin:0 0 6px;
+    text-shadow:0 2px 0 var(--coral-dark),0 4px 12px rgba(0,40,60,.4);
+  }
+  .winners-strip{
+    display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 12px;min-height:30px;
+  }
+  .winner-chip{
+    background:#fff;border-radius:999px;padding:6px 14px 6px 10px;font-weight:800;
+    color:var(--ink);box-shadow:0 4px 12px rgba(0,40,60,.25);display:flex;align-items:center;gap:6px;
+    animation:pop .4s cubic-bezier(.2,1.4,.4,1);
+  }
+  .winner-chip .medal{font-size:18px}
+  .winner-chip.placeholder{background:rgba(255,255,255,.22);color:#eaffff;box-shadow:none;font-weight:700}
+  @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+
+  .ring{
+    position:relative;width:min(76vw,620px);aspect-ratio:1/1;
+    border-radius:50%;
+    background:
+      radial-gradient(circle at 50% 42%, #fff7df 0%, #ffe9b8 38%, var(--sand) 52%, var(--sand-dark) 60%, #d8b777 64%);
+    border:16px solid #ffe1a8;
+    box-shadow:0 18px 40px rgba(0,40,60,.35), inset 0 0 40px rgba(0,40,60,.12),
+               0 0 0 6px rgba(255,255,255,.6);
+  }
+  canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:50%}
+
+  .start-btn{
+    margin-top:22px;border:0;cursor:pointer;color:#fff;font-weight:900;
+    font-size:clamp(20px,2.6vw,26px);letter-spacing:.04em;
+    padding:16px 46px;border-radius:999px;
+    background:linear-gradient(180deg,#ffb13c,#ff7a1c);
+    border:4px solid #fff;
+    box-shadow:0 10px 24px rgba(255,122,28,.5);
+    transition:transform .12s, box-shadow .12s, filter .2s;
+  }
+  .start-btn:hover:not(:disabled){transform:scale(1.05) rotate(-1deg)}
+  .start-btn:active:not(:disabled){transform:scale(.97)}
+  .start-btn:disabled{filter:grayscale(.7) brightness(.9);cursor:not-allowed;box-shadow:none}
+  .start-btn .small{display:block;font-size:12px;font-weight:700;opacity:.9;letter-spacing:.2em}
+
+  .stage-note{color:#eafcff;font-weight:600;margin-top:10px;min-height:20px;text-shadow:0 1px 3px rgba(0,40,60,.4)}
+  .reset-link{margin-top:6px;background:none;border:0;color:#eafcff;text-decoration:underline;
+    cursor:pointer;font-size:13px;opacity:.85;font-family:inherit}
+  .reset-link:hover{opacity:1}
+
+  /* ===== 当選ポップアップ ===== */
+  .overlay{
+    position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;
+    background:rgba(2,30,45,.62);backdrop-filter:blur(2px);
+  }
+  .overlay.show{display:flex;animation:fade .3s}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .modal{
+    background:var(--paper);border-radius:26px;padding:30px 34px 26px;text-align:center;
+    box-shadow:0 24px 60px rgba(0,0,0,.4);border:4px solid #fff;max-width:88vw;
+    animation:popIn .5s cubic-bezier(.2,1.5,.4,1);
+  }
+  @keyframes popIn{from{transform:scale(.5) translateY(20px);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal .ribbon{
+    display:inline-block;background:linear-gradient(180deg,var(--coral),var(--coral-dark));
+    color:#fff;font-weight:800;padding:6px 20px;border-radius:999px;font-size:15px;margin-bottom:10px;
+    box-shadow:0 6px 14px rgba(224,65,75,.4)
+  }
+  .modal .congrats{font-size:14px;font-weight:700;color:var(--mango);letter-spacing:.3em;margin:4px 0}
+  .modal .name{font-size:clamp(30px,7vw,52px);font-weight:900;color:var(--ink);margin:6px 0 4px;line-height:1.1}
+  .modal .name small{font-size:.42em;color:var(--ink-soft);font-weight:800}
+  .modal .ok{
+    margin-top:18px;border:0;cursor:pointer;color:#fff;font-weight:900;font-size:18px;
+    padding:12px 40px;border-radius:999px;background:linear-gradient(180deg,#2bcbba,#0fa99b);
+    box-shadow:0 8px 18px rgba(15,169,155,.4);transition:transform .1s;
+  }
+  .modal .ok:active{transform:scale(.96)}
+  .confetti{position:fixed;inset:0;z-index:49;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Summer Award Festival</div>
+    <h1><span class="swing">波乗りサンタ</span>★サマールーレット</h1>
+    <p class="sub">海辺に建つ社員の家へ、サンタがサーフボードで波乗り当選！</p>
+  </header>
+
+  <div class="layout">
+    <!-- 設定パネル -->
+    <section class="panel">
+      <h2><span class="dot"></span>賞を選ぶ</h2>
+      <div class="mode-toggle four">
+        <button class="mode-btn active" data-mode="president" type="button">社長賞①<span class="label">1名</span></button>
+        <button class="mode-btn" data-mode="president2" type="button">社長賞②<span class="label">1名</span></button>
+        <button class="mode-btn" data-mode="division" type="button">本部長賞<span class="label">1名</span></button>
+        <button class="mode-btn" data-mode="special" type="button">特別賞<span class="label">3名</span></button>
+      </div>
+
+      <!-- 賞品カード -->
+      <div class="prize-card" id="prizeCard"></div>
+
+      <div class="field">
+        <label for="presidentName">社長①の名前</label>
+        <input id="presidentName" type="text" placeholder="例：山田 太郎" value="山田 太郎">
+        <div class="hint">社長賞①の贈呈者として表示されます</div>
+      </div>
+      <div class="field">
+        <label for="president2Name">社長②（もう一人）の名前</label>
+        <input id="president2Name" type="text" placeholder="例：田中 一郎" value="田中 一郎">
+        <div class="hint">社長賞②の贈呈者として表示されます</div>
+      </div>
+      <div class="field">
+        <label for="divisionName">本部長の名前</label>
+        <input id="divisionName" type="text" placeholder="例：佐藤 花子" value="佐藤 花子">
+        <div class="hint">本部長賞の贈呈者として表示されます</div>
+      </div>
+
+      <details class="prize-urls">
+        <summary>🖼 賞品画像（任意：URLを貼ると実物写真になります）</summary>
+        <div id="prizeImgInputs"></div>
+      </details>
+
+      <h2 style="margin-top:18px"><span class="dot"></span>参加者（最大20名）</h2>
+      <div class="members" id="memberList"></div>
+      <button class="add-btn" id="addBtn" type="button">＋ 参加者を追加</button>
+      <div class="count-line"><span id="memberCount">0</span> 名／20名</div>
+
+      <div class="sound-row">
+        <button class="toggle-btn on" id="bgmBtn" type="button">🎵 BGM ON</button>
+        <button class="toggle-btn on" id="sfxBtn" type="button">🔊 効果音 ON</button>
+      </div>
+    </section>
+
+    <!-- ステージ -->
+    <section class="stage">
+      <h3 class="award-title" id="awardTitle">社長賞① ルーレット（当選1名）</h3>
+      <div class="prize-banner" id="prizeBanner"></div>
+      <div class="winners-strip" id="winnersStrip"></div>
+      <div class="ring">
+        <canvas id="wheel"></canvas>
+      </div>
+      <button class="start-btn" id="startBtn" type="button">
+        スイング開始！<span class="small">SPIN &amp; SWING</span>
+      </button>
+      <div class="stage-note" id="stageNote">ボタンを押すとルーレットが回ります</div>
+      <button class="reset-link" id="resetBtn" type="button">この賞の当選者をリセット</button>
+    </section>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="ribbon" id="modalRibbon">社長賞①</div>
+    <div class="congrats">CONGRATULATIONS</div>
+    <div class="name" id="modalName">―</div>
+    <div style="font-weight:700;color:var(--ink-soft)" id="modalSub"></div>
+    <div class="modal-prize" id="modalPrize"></div>
+    <button class="ok" id="modalOk" type="button">やったー！</button>
+  </div>
+</div>
+<canvas class="confetti" id="confetti"></canvas>
+
+<script>
+(()=>{
+"use strict";
+const TAU = Math.PI*2;
+
+/* ============================================================
+   状態
+============================================================ */
+// 賞品の定義（key, 名称, 公式リンク, アイコン種別）
+const PR = {
+  bakune:  {key:"bakune",  name:"BAKUNE 掛け布団 オーガニックコットン（シングル）", short:"BAKUNE 掛け布団", url:"https://tential.jp/products/bakune-comforter-organiccotton-26ss?color=Greige", icon:"comforter"},
+  anker:   {key:"anker",   name:"Anker Nebula Capsule Air", short:"Nebula Capsule Air", url:"https://www.ankerjapan.com/products/d4112", icon:"projector"},
+  jtb:     {key:"jtb",     name:"JTB旅行券 30,000円分", short:"JTB旅行券 3万円", url:"https://www.jtb.co.jp/gift/use/", icon:"ticket"},
+  massage: {key:"massage", name:"マッサージガン", short:"マッサージガン", url:"https://www.dr-air.com/jp/ja/products/exagun-hyper/", icon:"massagegun"},
+  plush:   {key:"plush",   name:"ふんばるず", short:"ふんばるず", url:"https://www.dreams6.com/products/funbarus/", icon:"plush"}
+};
+
+const state = {
+  mode:"president",
+  members:["山田 太郎","佐藤 花子","鈴木 一郎","高橋 美咲","田中 健太","伊藤 さくら","渡辺 翔","中村 結衣"],
+  awards:{
+    president:  { label:"社長賞①", count:1, giver:"presidentName",  prizes:[PR.bakune], winners:[] },
+    president2: { label:"社長賞②", count:1, giver:"president2Name", prizes:[PR.anker],  winners:[] },
+    division:   { label:"本部長賞", count:1, giver:"divisionName",  prizes:[PR.jtb],    winners:[] },
+    special:    { label:"特別賞",   count:3, giver:null,             prizes:[PR.massage, PR.plush, PR.plush], winners:[] }
+  },
+  prizeImg:{ bakune:"", anker:"", jtb:"", massage:"", plush:"" }, // ユーザーが貼った画像URL
+  wheelList:[],
+  phase:"idle"
+};
+const MAX_MEMBERS = 20;
+
+function award(){ return state.awards[state.mode]; }
+function activeMembers(){ return state.members.map(s=>s.trim()).filter(Boolean); }
+// すべての賞の当選者（賞をまたいで重複させない）
+function allWinnerSet(){
+  const s=new Set();
+  Object.values(state.awards).forEach(a=>a.winners.forEach(n=>s.add(n)));
+  return s;
+}
+function winnerAwardLabel(name){
+  for(const a of Object.values(state.awards)){
+    if(a.winners.includes(name)) return a.label;
+  }
+  return null;
+}
+function eligibleMembers(){
+  const won = allWinnerSet();
+  return activeMembers().filter(n=>!won.has(n));
+}
+function syncWheel(){
+  if(state.phase==="idle"){ state.wheelList = eligibleMembers(); }
+}
+function awardPersonName(){
+  const k=award().giver;
+  return k ? (document.getElementById(k).value.trim()) : "";
+}
+function awardLabel(){ return award().label; }
+function winnersNeeded(){ return award().count; }
+// この賞の i 番目（0始まり）の当選者がもらう賞品
+function prizeForSlot(a, idx){ return a.prizes[Math.min(idx, a.prizes.length-1)]; }
+
+/* ============================================================
+   賞品アイコン（SVGイラスト・オフラインでも表示）
+============================================================ */
+const PRIZE_ICONS = {
+  comforter:'<svg viewBox="0 0 64 64"><rect x="6" y="20" width="52" height="30" rx="6" fill="#bfe3f2" stroke="#5aa6c2" stroke-width="2"/><path d="M6 30 q6 -6 12 0 q6 6 12 0 q6 -6 12 0 q6 6 10 0" fill="none" stroke="#7fc0d8" stroke-width="2"/><rect x="10" y="14" width="20" height="12" rx="5" fill="#fff" stroke="#5aa6c2" stroke-width="2"/><rect x="6" y="46" width="52" height="8" rx="3" fill="#8d5a36"/></svg>',
+  projector:'<svg viewBox="0 0 64 64"><rect x="16" y="20" width="20" height="30" rx="9" fill="#3a3f47" stroke="#1f2329" stroke-width="2"/><ellipse cx="26" cy="20" rx="10" ry="4" fill="#5b626c"/><circle cx="26" cy="34" r="5" fill="#7fd6ff"/><path d="M36 28 L58 18 L58 50 L36 42 Z" fill="rgba(127,214,255,.45)"/><circle cx="26" cy="46" r="1.6" fill="#ffd54a"/></svg>',
+  ticket:'<svg viewBox="0 0 64 64"><path d="M8 18 h48 a0 0 0 0 1 0 0 v8 a4 4 0 0 0 0 8 v8 a0 0 0 0 1 0 0 H8 a0 0 0 0 1 0 0 v-8 a4 4 0 0 0 0 -8 v-8 a0 0 0 0 1 0 0 Z" fill="#ffe7a8" stroke="#e0a93b" stroke-width="2"/><path d="M30 26 l14 6 l-14 6 l3 -6 z" fill="#ff7a5c"/><text x="32" y="46" font-size="9" font-weight="900" fill="#a86b00" text-anchor="middle" font-family="sans-serif">旅行券</text></svg>',
+  massagegun:'<svg viewBox="0 0 64 64"><rect x="14" y="14" width="30" height="13" rx="6" fill="#ff7a5c" stroke="#d2492f" stroke-width="2"/><rect x="24" y="24" width="11" height="24" rx="4" fill="#3a3f47" stroke="#1f2329" stroke-width="2"/><circle cx="48" cy="20" r="7" fill="#3a3f47" stroke="#1f2329" stroke-width="2"/><rect x="22" y="46" width="15" height="6" rx="3" fill="#5b626c"/></svg>',
+  plush:'<svg viewBox="0 0 64 64"><circle cx="20" cy="16" r="6" fill="#c98b5b"/><circle cx="44" cy="16" r="6" fill="#c98b5b"/><circle cx="32" cy="34" r="18" fill="#e0a96d" stroke="#b07a45" stroke-width="2"/><circle cx="26" cy="32" r="2.4" fill="#3a2a22"/><circle cx="38" cy="32" r="2.4" fill="#3a2a22"/><ellipse cx="32" cy="40" rx="5" ry="4" fill="#fff2e0"/><circle cx="32" cy="38" r="1.8" fill="#3a2a22"/><path d="M18 50 q14 8 28 0" fill="#e0a96d" stroke="#b07a45" stroke-width="2"/></svg>'
+};
+function prizeIconSVG(icon){ return PRIZE_ICONS[icon]||""; }
+function prizeImageHTML(prize, sizeClass){
+  const url=(state.prizeImg[prize.key]||"").trim();
+  const icon=prizeIconSVG(prize.icon);
+  if(url){
+    return '<div class="prize-img '+sizeClass+'">'
+      +'<img src="'+escapeAttr(url)+'" alt="'+escapeAttr(prize.name)+'" '
+      +'style="width:100%;height:100%;object-fit:contain" '
+      +'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+      +'<span class="prize-fallback" style="display:none;width:100%;height:100%;align-items:center;justify-content:center">'+icon+'</span>'
+      +'</div>';
+  }
+  return '<div class="prize-img '+sizeClass+'">'+icon+'</div>';
+}
+
+/* ============================================================
+   サウンドエンジン（Web Audio・外部ファイル不要）
+============================================================ */
+const Sound = (()=>{
+  let ctx=null, master=null;
+  let bgmOn=true, sfxOn=true;
+  let bgmTimer=null, bgmStep=0, noiseBuf=null;
+  let nextNoteTime=0;
+
+  function ensure(){
+    if(ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    ctx = new AC();
+    master = ctx.createGain();
+    master.gain.value = 0.9;
+    master.connect(ctx.destination);
+    // ノイズバッファ（風切り音用）
+    const len = ctx.sampleRate*1.0;
+    noiseBuf = ctx.createBuffer(1,len,ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
+  }
+  function resume(){ ensure(); if(ctx && ctx.state==="suspended") ctx.resume(); }
+
+  // 単音（マリンバ/スチールドラム風プラック）
+  function pluck(freq,t,dur,type,gain){
+    if(!ctx) return;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = type||"triangle";
+    o.frequency.setValueAtTime(freq,t);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(gain,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    o.connect(g).connect(master);
+    o.start(t); o.stop(t+dur+0.02);
+  }
+
+  // ===== BGM：夏のサーフ系J-POP風（王道進行 IV-V-iii-vi のオリジナル曲） =====
+  // 音名（Hz）
+  const N={
+    E2:82.41,F2:87.31,G2:98.00,A2:110.00,B2:123.47,C3:130.81,D3:146.83,E3:164.81,
+    G3:196.00,A3:220.00,B3:246.94,C4:261.63,D4:293.66,E4:329.63,F4:349.23,
+    G4:392.00,A4:440.00,B4:493.88,C5:523.25,D5:587.33,E5:659.25,G5:783.99,A5:880.0
+  };
+  // 1小節=8ステップ(8分音符)。4小節ループ：Fmaj7 - G - Em7 - Am7
+  const STEP_DUR = 0.30; // ゆったりめ(約100BPM)
+  const chordRoots = [N.F2, N.G2, N.E2, N.A2];
+  // 裏拍に置くやわらかいコード(アイランド風スカ)
+  const chordVoicings = [
+    [N.A3,N.C4,N.E4],   // Fmaj7
+    [N.B3,N.D4,N.G4],   // G
+    [N.B3,N.D4,N.E4],   // Em7
+    [N.C4,N.E4,N.A4]    // Am7
+  ];
+  // メロディ(オリジナル・夏のせつなさ)。32ステップ、0は休符
+  const melody = [
+    N.A4,0,N.C5,0, N.D5,0,N.C5,N.A4,   // Fmaj7
+    N.B4,0,N.D5,0, 0,N.D5,N.B4,0,       // G
+    N.G4,0,N.B4,0, N.E5,0,N.D5,0,       // Em7
+    N.C5,0,N.A4,0, 0,N.E4,N.G4,N.A4     // Am7
+  ];
+
+  // やわらかいパッド/リード（サイン＋微妙なデチューンで温かみ）
+  function lead(freq,t,dur,gain){
+    if(!ctx) return;
+    [0,2.5].forEach((cents,i)=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type="sine"; o.frequency.value=freq*(1+cents/1000);
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(gain*(i?0.5:1),t+0.06);
+      g.gain.setValueAtTime(gain*(i?0.5:1),t+dur*0.6);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      o.connect(g).connect(master); o.start(t); o.stop(t+dur+0.05);
+    });
+    // 倍音をひとつまみ
+    const o2=ctx.createOscillator(), g2=ctx.createGain();
+    o2.type="triangle"; o2.frequency.value=freq*2;
+    g2.gain.setValueAtTime(0.0001,t);
+    g2.gain.exponentialRampToValueAtTime(gain*0.18,t+0.05);
+    g2.gain.exponentialRampToValueAtTime(0.0001,t+dur*0.8);
+    o2.connect(g2).connect(master); o2.start(t); o2.stop(t+dur+0.05);
+  }
+  // やさしいキック
+  function kick(t){
+    if(!ctx) return;
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(120,t);
+    o.frequency.exponentialRampToValueAtTime(45,t+0.12);
+    g.gain.setValueAtTime(0.22,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.22);
+    o.connect(g).connect(master); o.start(t); o.stop(t+0.24);
+  }
+  // シェイカー(夏の砂浜っぽい)
+  function shaker(t,gain){
+    if(!ctx) return;
+    const src=ctx.createBufferSource(); src.buffer=noiseBuf;
+    const hp=ctx.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=6500;
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(gain,t+0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.06);
+    src.connect(hp).connect(g).connect(master); src.start(t); src.stop(t+0.08);
+  }
+
+  function scheduleStep(step,t){
+    const s = ((step%32)+32)%32;
+    const bar = Math.floor(s/8);
+    const beat = s%8;            // 0..7 (8分)
+    // ベース：1拍目と3拍目(step0,4)。間に5度を軽く
+    if(beat===0) lead(chordRoots[bar], t, STEP_DUR*1.8, 0.16);
+    else if(beat===4) lead(chordRoots[bar]*1.5, t, STEP_DUR*1.6, 0.12);
+    else if(beat===6) lead(chordRoots[bar], t, STEP_DUR*1.2, 0.10);
+    // 裏拍のコードスカ(step 1,3,5,7)
+    if(beat%2===1){
+      chordVoicings[bar].forEach(f=> pluck(f, t, STEP_DUR*0.8, "triangle", 0.05));
+    }
+    // メロディ
+    const mf = melody[s];
+    if(mf) lead(mf, t, STEP_DUR*1.5, 0.13);
+    // ドラム
+    if(beat===0 || beat===4) kick(t);
+    shaker(t, beat%2===1 ? 0.05 : 0.025);
+  }
+
+  function scheduler(){
+    if(!ctx||!bgmOn) return;
+    while(nextNoteTime < ctx.currentTime + 0.12){
+      scheduleStep(bgmStep, nextNoteTime);
+      nextNoteTime += STEP_DUR;
+      bgmStep++;
+    }
+  }
+  function startBgm(){
+    ensure(); if(!ctx) return;
+    stopBgm();
+    bgmStep=0; nextNoteTime = ctx.currentTime + 0.1;
+    scheduler();
+    bgmTimer = setInterval(scheduler, 25);
+  }
+  function stopBgm(){ if(bgmTimer){ clearInterval(bgmTimer); bgmTimer=null; } }
+
+  // ===== 効果音：ビュン！という風切り音 =====
+  function whoosh(intensity){
+    if(!ctx||!sfxOn) return;
+    const t = ctx.currentTime;
+    const src = ctx.createBufferSource();
+    src.buffer = noiseBuf;
+    const bp = ctx.createBiquadFilter();
+    bp.type="bandpass"; bp.Q.value=6;
+    const g = ctx.createGain();
+    const dur = 0.18 + intensity*0.16;
+    const lo = 380, hi = 900 + intensity*1700;
+    bp.frequency.setValueAtTime(lo,t);
+    bp.frequency.exponentialRampToValueAtTime(hi,t+dur*0.45);
+    bp.frequency.exponentialRampToValueAtTime(lo,t+dur);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.12+intensity*0.16,t+0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    src.connect(bp).connect(g).connect(master);
+    src.start(t); src.stop(t+dur+0.02);
+  }
+
+  // ===== ベル（鈴）の音 =====
+  function bell(freq,t,dur,gain){
+    if(!ctx) return;
+    const partials=[[1,1],[2.0,0.5],[2.41,0.32],[3.0,0.2],[4.2,0.12]];
+    partials.forEach(([r,a])=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type="sine"; o.frequency.value=freq*r;
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(gain*a,t+0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      o.connect(g).connect(master); o.start(t); o.stop(t+dur+0.03);
+    });
+  }
+  // ===== そりの鈴（シャラララ） =====
+  function sleighBells(t,count){
+    if(!ctx) return;
+    for(let i=0;i<count;i++){
+      const tt=t+i*0.06;
+      const src=ctx.createBufferSource(); src.buffer=noiseBuf;
+      const bp=ctx.createBiquadFilter();
+      bp.type="bandpass"; bp.frequency.value=5200+Math.random()*3000; bp.Q.value=10;
+      const g=ctx.createGain();
+      g.gain.setValueAtTime(0.0001,tt);
+      g.gain.exponentialRampToValueAtTime(0.10,tt+0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001,tt+0.13);
+      src.connect(bp).connect(g).connect(master); src.start(tt); src.stop(tt+0.15);
+    }
+  }
+
+  // ===== シンバルクラッシュ＋ドン（当選の一撃） =====
+  function crash(){
+    if(!ctx) return;
+    const t=ctx.currentTime;
+    const src=ctx.createBufferSource(); src.buffer=noiseBuf;
+    const hp=ctx.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=2600;
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.5,t+0.008); g.gain.exponentialRampToValueAtTime(0.0001,t+1.3);
+    src.connect(hp).connect(g).connect(master); src.start(t); src.stop(t+1.4);
+    const o=ctx.createOscillator(), og=ctx.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(48,t+0.3);
+    og.gain.setValueAtTime(0.5,t); og.gain.exponentialRampToValueAtTime(0.0001,t+0.5);
+    o.connect(og).connect(master); o.start(t); o.stop(t+0.55);
+  }
+  // ===== スピン時の盛り上げライザー（シャーッと上昇） =====
+  function riser(){
+    if(!ctx||!sfxOn) return;
+    const t=ctx.currentTime;
+    const src=ctx.createBufferSource(); src.buffer=noiseBuf; src.loop=true;
+    const bp=ctx.createBiquadFilter(); bp.type="bandpass"; bp.Q.value=4;
+    bp.frequency.setValueAtTime(280,t); bp.frequency.exponentialRampToValueAtTime(4200,t+1.8);
+    const g=ctx.createGain();
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.12,t+1.5); g.gain.exponentialRampToValueAtTime(0.0001,t+1.95);
+    src.connect(bp).connect(g).connect(master); src.start(t); src.stop(t+2.0);
+  }
+
+  // ===== 当選ファンファーレ（ベル＋鈴で華やかに） =====
+  function fanfare(){
+    if(!ctx) return;
+    const t = ctx.currentTime;
+    crash();   // 一撃で華やかに
+    // 明るいベルのアルペジオ（C E G C5 E5 G5）
+    const arp=[N.C4,N.E4,N.G4,N.C5,N.E5,N.G5];
+    arp.forEach((f,i)=> bell(f, t+i*0.085, 1.4, 0.16));
+    // てっぺんでキラーン
+    bell(N.C5*2, t+0.55, 2.2, 0.18);
+    bell(N.G5,   t+0.55, 2.2, 0.12);
+    // そりの鈴をたっぷり
+    sleighBells(t, 12);
+    sleighBells(t+0.5, 10);
+    sleighBells(t+1.0, 8);
+    // 下支えの温かいコード
+    lead(N.C3, t, 1.6, 0.12);
+    lead(N.G3, t, 1.6, 0.10);
+    lead(N.E4, t+0.55, 1.4, 0.10);
+  }
+
+  return {
+    resume,
+    setBgm(v){ bgmOn=v; if(v) startBgm(); else stopBgm(); },
+    setSfx(v){ sfxOn=v; },
+    isBgm(){ return bgmOn; },
+    startBgmIfOn(){ if(bgmOn) startBgm(); },
+    whoosh, fanfare, riser
+  };
+})();
+
+/* ============================================================
+   キャンバス描画
+============================================================ */
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+let W=560,H=560,cx=280,cy=280;
+const HOUSE_R = 196;     // 家が並ぶ半径
+const SWING_R = 70;      // スイングの半径
+let dpr=1;
+
+function resize(){
+  const rect = canvas.getBoundingClientRect();
+  const size = Math.max(360, Math.min(rect.width, rect.height));
+  dpr = Math.min(window.devicePixelRatio||1, 2);
+  W=H=size; cx=cy=size/2;
+  canvas.width = size*dpr; canvas.height = size*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+/* 描画用パラメータ */
+let wheelAngle=0, swingAngle=0;
+let wheelStart=0, wheelTarget=0, swingStart=0, swingTarget=0;
+let animStart=0, animDur=5200;
+let flyStart=0;
+let flySpinStart=0;            // 飛行開始時のサーフボード回転角
+let winningIndex=-1;         // 今回当選した members(active) のindex
+let lastWhoosh=0;
+const confetti=[];
+const sparkles=[];        // メインキャンバスのキラキラ火花
+let flash=0;              // 当選時の画面フラッシュ(0..1)
+
+function spawnSparkle(x,y,spread,speed,colorSet){
+  const a=Math.random()*TAU, sp=speed*(0.5+Math.random());
+  sparkles.push({
+    x:x+(Math.random()-0.5)*spread, y:y+(Math.random()-0.5)*spread,
+    vx:Math.cos(a)*sp, vy:Math.sin(a)*sp,
+    life:1, decay:0.025+Math.random()*0.03,
+    s:1.6+Math.random()*2.6, c:colorSet[(Math.random()*colorSet.length)|0],
+    star:Math.random()<0.3
+  });
+}
+const SPARK_GOLD=["#fff","#ffe27a","#ffd54a","#ffb84d"];
+function drawSparkles(){
+  for(let i=sparkles.length-1;i>=0;i--){
+    const p=sparkles[i];
+    p.x+=p.vx; p.y+=p.vy; p.vx*=0.96; p.vy*=0.96; p.life-=p.decay;
+    if(p.life<=0){ sparkles.splice(i,1); continue; }
+    ctx.globalAlpha=Math.max(0,p.life);
+    ctx.fillStyle=p.c;
+    ctx.shadowColor=p.c; ctx.shadowBlur=8;
+    if(p.star){ drawStar(p.x,p.y,p.s*1.8,p.c); }
+    else { ctx.beginPath(); ctx.arc(p.x,p.y,p.s,0,TAU); ctx.fill(); }
+  }
+  ctx.globalAlpha=1; ctx.shadowBlur=0;
+}
+function drawStar(x,y,r,color){
+  ctx.fillStyle=color; ctx.beginPath();
+  for(let i=0;i<5;i++){
+    const a=-Math.PI/2+i*TAU/5, a2=a+TAU/10;
+    ctx.lineTo(x+Math.cos(a)*r, y+Math.sin(a)*r);
+    ctx.lineTo(x+Math.cos(a2)*r*0.46, y+Math.sin(a2)*r*0.46);
+  }
+  ctx.closePath(); ctx.fill();
+}
+// 電飾（マーキー）：リムをぐるりと囲む豆電球
+function drawMarquee(time){
+  const Rb=HOUSE_R+52, count=30;
+  const cel=state.phase==="celebrate";
+  const spinning=state.phase==="spinning"||state.phase==="flying";
+  const speed = spinning?70:(cel?110:200);
+  const step=Math.floor(time/speed);
+  for(let i=0;i<count;i++){
+    const a=(i/count)*TAU - Math.PI/2;
+    const x=cx+Rb*Math.cos(a), y=cy+Rb*Math.sin(a);
+    const on = cel ? ((i+step)%2===0) : ((i+step)%3===0);
+    if(on){
+      ctx.fillStyle = cel ? (((i+step)%4<2)?"#ffd54a":"#ff5a5f") : "#ffe27a";
+      ctx.shadowColor=ctx.fillStyle; ctx.shadowBlur=14;
+    } else { ctx.fillStyle="#fbeec0"; ctx.shadowBlur=0; }
+    ctx.beginPath(); ctx.arc(x,y,5,0,TAU); ctx.fill();
+  }
+  ctx.shadowBlur=0;
+}
+// 回転する光のビーム（当選した家から）
+function drawBeams(x,y,time,len,alpha){
+  ctx.save(); ctx.translate(x,y); ctx.rotate(time/700);
+  const rays=12;
+  for(let i=0;i<rays;i++){
+    ctx.rotate(TAU/rays);
+    ctx.fillStyle="rgba(255,221,120,"+alpha+")";
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(len,-9); ctx.lineTo(len,9); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function easeOutQuart(t){ return 1-Math.pow(1-t,4); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+
+/* 太陽・海の背景 */
+function drawScene(time){
+  // 海（中央〜内側）
+  const g = ctx.createRadialGradient(cx,cy,10,cx,cy,HOUSE_R+10);
+  g.addColorStop(0,"#bff0ff");
+  g.addColorStop(.5,"#3fc4e6");
+  g.addColorStop(1,"#0093c4");
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.arc(cx,cy,HOUSE_R+6,0,TAU); ctx.fill();
+
+  // 回転する太陽光線（スピン中は速く・当選時は金色で華やか）
+  const cel=state.phase==="celebrate";
+  const fast=state.phase==="spinning"||state.phase==="flying";
+  const spin = fast ? time/500 : (cel ? time/650 : time/3200);
+  const rayA = cel ? 0.16 : (fast ? 0.12 : 0.07);
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(spin);
+  const rays=20;
+  for(let i=0;i<rays;i++){
+    ctx.rotate(TAU/rays);
+    ctx.fillStyle = (i%2)? "rgba(255,255,255,"+(rayA*0.7)+")" : "rgba(255,236,150,"+rayA+")";
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(HOUSE_R*0.95,-11); ctx.lineTo(HOUSE_R*0.95,11); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+
+  // きらめく波（同心円）
+  ctx.lineWidth=2;
+  for(let r=40;r<HOUSE_R;r+=26){
+    ctx.beginPath();
+    ctx.strokeStyle="rgba(255,255,255,"+(0.12+0.04*Math.sin(time/600+r))+")";
+    ctx.arc(cx,cy,r + Math.sin(time/700+r*0.05)*3,0,TAU);
+    ctx.stroke();
+  }
+  // 太陽（中央の後ろ）
+  const sg=ctx.createRadialGradient(cx,cy,4,cx,cy,64);
+  sg.addColorStop(0,"#fff6d0"); sg.addColorStop(.6,"#ffe07a"); sg.addColorStop(1,"rgba(255,210,90,0)");
+  ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(cx,cy,64,0,TAU); ctx.fill();
+}
+
+/* 家を描く */
+function drawHouse(x,y,name,kind){
+  // kind: "normal" | "won" | "winning"
+  const winning = kind==="winning";
+  const won = kind==="won";
+  const bob = winning ? Math.sin(performance.now()/120)*4 : 0;
+  ctx.save();
+  ctx.translate(x,y - bob);
+
+  // 当選グロー（脈打つ光のリング＋スポットライト）
+  if(winning){
+    const tnow=performance.now();
+    // 広がるリング
+    for(let k=0;k<3;k++){
+      const rr=((tnow/16 + k*40) % 120);
+      ctx.strokeStyle="rgba(255,207,77,"+(0.5*(1-rr/120))+")";
+      ctx.lineWidth=4;
+      ctx.beginPath(); ctx.arc(0,0,30+rr,0,TAU); ctx.stroke();
+    }
+    ctx.save();
+    ctx.shadowColor="rgba(255,207,77,1)"; ctx.shadowBlur=34;
+    ctx.fillStyle="rgba(255,231,150,"+(0.25+0.12*Math.sin(tnow/120))+")";
+    ctx.beginPath(); ctx.arc(0,0,44,0,TAU); ctx.fill();
+    ctx.restore();
+  }
+
+  const w=58,h=40;
+  // 影
+  ctx.fillStyle="rgba(0,40,60,.18)";
+  ctx.beginPath(); ctx.ellipse(0,h*0.5+8,w*0.5,8,0,0,TAU); ctx.fill();
+
+  // 本体
+  ctx.fillStyle = won ? "#dfeef2" : "#fffaf0";
+  roundRect(-w/2, -h*0.2, w, h, 6); ctx.fill();
+  ctx.strokeStyle="rgba(0,40,60,.15)"; ctx.lineWidth=1.5; ctx.stroke();
+
+  // 屋根
+  ctx.fillStyle = winning ? "#ff8a1c" : (won ? "#9fb8c0" : "#ff5a5f");
+  ctx.beginPath();
+  ctx.moveTo(-w/2-5,-h*0.2);
+  ctx.lineTo(0,-h*0.2-26);
+  ctx.lineTo(w/2+5,-h*0.2);
+  ctx.closePath(); ctx.fill();
+
+  // 表札（名前）
+  const plateW=w-8, plateH=16;
+  ctx.fillStyle="#fff7df";
+  roundRect(-plateW/2, h*0.05, plateW, plateH, 4); ctx.fill();
+  ctx.strokeStyle="#caa24a"; ctx.lineWidth=1.5; ctx.stroke();
+
+  ctx.fillStyle="#5a4a1a";
+  fitText(name, plateW-6);
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText(name, 0, h*0.05+plateH/2+0.5);
+
+  // 当選マーク（王冠）
+  if(won || winning){
+    ctx.fillStyle = winning ? "#ffd54a" : "#cfe0e6";
+    drawCrown(0, -h*0.2-26-9, 18);
+  }
+  ctx.restore();
+}
+
+function drawCrown(x,y,s){
+  ctx.save(); ctx.translate(x,y);
+  ctx.beginPath();
+  ctx.moveTo(-s/2, s*0.35);
+  ctx.lineTo(-s/2,-s*0.1);
+  ctx.lineTo(-s/4, s*0.12);
+  ctx.lineTo(0,-s*0.28);
+  ctx.lineTo(s/4, s*0.12);
+  ctx.lineTo(s/2,-s*0.1);
+  ctx.lineTo(s/2, s*0.35);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle="rgba(140,90,0,.4)"; ctx.lineWidth=1; ctx.stroke();
+  ctx.restore();
+}
+
+/* 夏のまんまるサンタ（サングラスなし・名前表示なし） */
+function drawSanta(x,y,rot,scale){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(rot);
+  ctx.scale(scale,scale);
+  ctx.lineJoin="round";
+
+  // まんまるの胴体（赤＋白フリル）
+  ctx.fillStyle="#ff5a5f";
+  ctx.beginPath(); ctx.arc(0,8,15,0,TAU); ctx.fill();
+  // 白いベルト
+  ctx.fillStyle="#fff";
+  roundRect(-15,9,30,5,2.5); ctx.fill();
+  // ちびっこ手足（丸み）
+  ctx.fillStyle="#f6c9a0";
+  ctx.beginPath(); ctx.arc(-15,4,5,0,TAU); ctx.fill();   // 左手
+  ctx.beginPath(); ctx.arc(15,4,5,0,TAU); ctx.fill();    // 右手
+  ctx.fillStyle="#ffce54";
+  ctx.beginPath(); ctx.arc(-7,22,5.5,0,TAU); ctx.fill(); // 足(サンダル風)
+  ctx.beginPath(); ctx.arc(7,22,5.5,0,TAU); ctx.fill();
+
+  // まんまる頭
+  ctx.fillStyle="#ffd9b3";
+  ctx.beginPath(); ctx.arc(0,-13,15,0,TAU); ctx.fill();
+
+  // ふわふわ白ひげ（下半分を丸く包む）
+  ctx.fillStyle="#fff";
+  ctx.beginPath();
+  ctx.arc(0,-9,13,0.1*Math.PI,0.9*Math.PI,false);
+  ctx.arc(0,-7,5,0.9*Math.PI,0.1*Math.PI,true);
+  ctx.closePath(); ctx.fill();
+  // ひげのもこもこ
+  ctx.beginPath(); ctx.arc(-9,-3,4,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(9,-3,4,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(0,1,4.5,0,TAU); ctx.fill();
+
+  // ほっぺ（ピンク）
+  ctx.fillStyle="rgba(255,138,150,.75)";
+  ctx.beginPath(); ctx.arc(-8,-11,3.2,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(8,-11,3.2,0,TAU); ctx.fill();
+  // つぶらな目
+  ctx.fillStyle="#3a2a22";
+  ctx.beginPath(); ctx.arc(-5,-14,2.1,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(5,-14,2.1,0,TAU); ctx.fill();
+  ctx.fillStyle="#fff";
+  ctx.beginPath(); ctx.arc(-4.3,-14.8,0.7,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc(5.7,-14.8,0.7,0,TAU); ctx.fill();
+  // にっこり口
+  ctx.strokeStyle="#c0392b"; ctx.lineWidth=1.4; ctx.lineCap="round";
+  ctx.beginPath(); ctx.arc(0,-9,2.4,0.1*Math.PI,0.9*Math.PI); ctx.stroke();
+  // 鼻
+  ctx.fillStyle="#ffb38a";
+  ctx.beginPath(); ctx.arc(0,-11,1.6,0,TAU); ctx.fill();
+
+  // まる〜いサンタ帽
+  ctx.fillStyle="#ff3b3b";
+  ctx.beginPath();
+  ctx.moveTo(-14,-24);
+  ctx.quadraticCurveTo(-4,-44, 14,-34);
+  ctx.quadraticCurveTo(6,-26, -14,-24);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle="#fff"; // 白フチ
+  roundRect(-15,-27,30,6,3); ctx.fill();
+  ctx.beginPath(); ctx.arc(15,-34,4.5,0,TAU); ctx.fill(); // ぽんぽん
+
+  ctx.restore();
+}
+
+/* サンタが乗った横向きサーフボード（これ全体が回転する） */
+function drawSurfer(x,y,rot,scale){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(rot);
+  ctx.scale(scale,scale);
+
+  const bw=78, bh=24, by=18;   // ボードの幅・高さ・中心Y(サンタの足元あたり)
+  // 影
+  ctx.fillStyle="rgba(0,40,60,.18)";
+  ctx.beginPath(); ctx.ellipse(0,by+12,bw*0.42,7,0,0,TAU); ctx.fill();
+  // フィン（下）
+  ctx.fillStyle="#2bcbba";
+  ctx.beginPath(); ctx.moveTo(-6,by+bh*0.4); ctx.lineTo(2,by+bh*0.4+12); ctx.lineTo(8,by+bh*0.4); ctx.closePath(); ctx.fill();
+  // ボード本体（横向き・夏のグラデ）
+  const grad=ctx.createLinearGradient(-bw/2,0,bw/2,0);
+  grad.addColorStop(0,"#ffe14d");
+  grad.addColorStop(0.5,"#ff9f3c");
+  grad.addColorStop(1,"#ff5a8a");
+  ctx.fillStyle=grad;
+  ctx.beginPath();
+  ctx.moveTo(-bw/2,by);                                 // とがった左端
+  ctx.quadraticCurveTo(-bw/2+10, by-bh/2, 0, by-bh/2);
+  ctx.quadraticCurveTo(bw/2-10, by-bh/2, bw/2, by);     // とがった右端
+  ctx.quadraticCurveTo(bw/2-10, by+bh/2, 0, by+bh/2);
+  ctx.quadraticCurveTo(-bw/2+10, by+bh/2, -bw/2, by);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle="rgba(255,255,255,.85)"; ctx.lineWidth=2.5; ctx.stroke();
+  // 中央ストリンガー
+  ctx.strokeStyle="rgba(255,255,255,.9)"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(-bw/2+6,by); ctx.lineTo(bw/2-6,by); ctx.stroke();
+  // ハイビスカス（左右）
+  drawFlower(-bw/2+18,by,5);
+  drawFlower(bw/2-18,by,5);
+
+  // ボードに乗ったサンタ（少しサーファー風に傾ける）
+  drawSanta(0,-6, 0.06, 0.92);
+
+  ctx.restore();
+}
+
+/* ハイビスカス風の花 */
+function drawFlower(x,y,r){
+  ctx.save(); ctx.translate(x,y);
+  ctx.fillStyle="#ff4f7b";
+  for(let i=0;i<5;i++){
+    ctx.rotate(TAU/5);
+    ctx.beginPath();
+    ctx.ellipse(0,-r,r*0.62,r,0,0,TAU); ctx.fill();
+  }
+  ctx.fillStyle="#ffd84d";
+  ctx.beginPath(); ctx.arc(0,0,r*0.42,0,TAU); ctx.fill();
+  ctx.restore();
+}
+
+function drawPointer(){
+  const y = cy - HOUSE_R - 30;
+  ctx.save();
+  ctx.fillStyle="#ff3b3b";
+  ctx.strokeStyle="#fff"; ctx.lineWidth=3;
+  ctx.beginPath();
+  ctx.moveTo(cx-16,y); ctx.lineTo(cx+16,y); ctx.lineTo(cx,y+22);
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle="#fff"; ctx.font="900 11px sans-serif";
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText("当", cx, y+8);
+  ctx.restore();
+}
+
+/* テキストを表札幅に合わせて縮める */
+function fitText(text,maxW){
+  let size=12;
+  ctx.font="800 "+size+"px 'Hiragino Maru Gothic ProN','Yu Gothic',sans-serif";
+  while(ctx.measureText(text).width>maxW && size>7){
+    size-=0.5;
+    ctx.font="800 "+size+"px 'Hiragino Maru Gothic ProN','Yu Gothic',sans-serif";
+  }
+}
+function roundRect(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* ============================================================
+   抽選フロー（ランダムな回転量で回し、止まった位置で当選を決定）
+============================================================ */
+let flyTX=0, flyTY=0;   // サンタが到着する当選者の家の座標
+
+// 角度の最小差（-π..π）
+function angDiff(a,b){
+  let d=(a-b)%TAU; if(d>Math.PI) d-=TAU; if(d<-Math.PI) d+=TAU; return d;
+}
+// 盤の回転角angleのとき、ポインター（真上 -π/2）に最も近い家のindex
+function houseNearPointer(angle, N){
+  let best=0, bestDiff=Infinity;
+  for(let i=0;i<N;i++){
+    const screen = (i/N)*TAU - Math.PI/2 + angle;
+    const d = Math.abs(angDiff(screen, -Math.PI/2));
+    if(d<bestDiff){ bestDiff=d; best=i; }
+  }
+  return best;
+}
+
+function startDraw(){
+  if(state.phase!=="idle") return;
+  if(activeMembers().length<2){ note("参加者を2名以上入力してください"); shakePanel(); return; }
+  if(award().winners.length>=winnersNeeded()){ note(awardLabel()+"はすでに"+winnersNeeded()+"名決定しています"); return; }
+
+  // この回の盤を確定（当選済みは外れている）
+  state.wheelList = eligibleMembers();
+  const N = state.wheelList.length;
+  if(N===0){ note("当選していない参加者がいません"); return; }
+
+  Sound.resume();
+  Sound.startBgmIfOn();
+  Sound.riser();
+
+  // ★ランダムな回転量で回す（当選者を事前に決めて止めない＝透明・公平）
+  const extraSpins = 5 + Math.floor(Math.random()*4);     // 5〜8周
+  const randomOffset = Math.random()*TAU;                 // 止まる位置は完全ランダム
+  wheelStart = wheelAngle;
+  wheelTarget = wheelStart + extraSpins*TAU + randomOffset;
+
+  // 止まった位置で当選を判定（必ずしも真上ぴったりではない）
+  winningIndex = houseNearPointer(wheelTarget, N);
+  const wa = (winningIndex/N)*TAU - Math.PI/2 + wheelTarget;
+  flyTX = cx + HOUSE_R*Math.cos(wa);
+  flyTY = cy + HOUSE_R*Math.sin(wa);
+
+  swingStart = swingAngle;
+  swingTarget = swingAngle + (8+Math.random()*3)*TAU;     // サンタは反時計回りに回転
+
+  animStart = performance.now();
+  animDur = 5200;
+  lastWhoosh = 0;
+  state.phase="spinning";
+  setControls(false);
+  note("ランダム抽選中…ビュン！");
+}
+
+function spinningTick(time){
+  const t = Math.min(1,(time-animStart)/animDur);
+  const e = easeOutQuart(t);
+  wheelAngle = lerp(wheelStart, wheelTarget, e);
+  swingAngle = lerp(swingStart, swingTarget, e);
+
+  // 風切り音：半回転ごと・速いほど高く
+  const half = Math.floor(swingAngle/Math.PI);
+  const speed = 1-t;                 // 終盤ほど遅い
+  if(half!==lastWhoosh && speed>0.06){
+    lastWhoosh=half;
+    Sound.whoosh(speed);
+  }
+  if(t>=1){
+    state.phase="flying";
+    flyStart=time;
+    flySpinStart=swingAngle;
+  }
+}
+
+function enterCelebrate(){
+  state.phase="celebrate";
+  const name = state.wheelList[winningIndex];
+  award().winners.push(name);
+  Sound.fanfare();
+  flash=1;                                  // 画面フラッシュ
+  burstConfetti();
+  setTimeout(()=>{ if(state.phase==="celebrate") burstConfetti(); }, 450);  // 追い焚き
+  setTimeout(()=>{ if(state.phase==="celebrate") burstConfetti(); }, 900);
+  // 当選した家から星がはじける
+  for(let k=0;k<46;k++) spawnSparkle(flyTX,flyTY,10,7,SPARK_GOLD);
+  showModal(name);
+  renderWinners();
+  renderMembers();      // 一覧に「○○賞当選」の印を付ける
+  note(awardLabel()+"："+name+" さん 当選！");
+}
+
+/* ============================================================
+   紙吹雪
+============================================================ */
+const confettiCanvas = document.getElementById("confetti");
+const cctx = confettiCanvas.getContext("2d");
+function sizeConfetti(){
+  confettiCanvas.width=innerWidth; confettiCanvas.height=innerHeight;
+}
+function burstConfetti(){
+  const colors=["#ff5a5f","#ffcf4d","#2bcbba","#00a8cc","#ff9f1c","#ffffff","#ff7ab5"];
+  for(let i=0;i<230;i++){
+    const star=Math.random()<0.22;
+    confetti.push({
+      x: innerWidth/2 + (Math.random()-0.5)*320,
+      y: innerHeight*0.30,
+      vx:(Math.random()-0.5)*12,
+      vy:-(Math.random()*11+5),
+      g:0.26+Math.random()*0.14,
+      rot:Math.random()*TAU, vr:(Math.random()-0.5)*0.5,
+      s:(star?9:6)+Math.random()*7,
+      c: star?"#ffd54a":colors[(Math.random()*colors.length)|0],
+      shape: star?"star":(Math.random()<0.5?"rect":"circle")
+    });
+  }
+}
+function updateConfetti(){
+  cctx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  // 画面フラッシュ
+  if(flash>0.01){
+    cctx.fillStyle="rgba(255,255,255,"+(flash*0.65)+")";
+    cctx.fillRect(0,0,confettiCanvas.width,confettiCanvas.height);
+    flash*=0.88;
+  } else flash=0;
+  for(let i=confetti.length-1;i>=0;i--){
+    const p=confetti[i];
+    p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+    if(p.y>confettiCanvas.height+30){ confetti.splice(i,1); continue; }
+    cctx.save(); cctx.translate(p.x,p.y); cctx.rotate(p.rot);
+    cctx.fillStyle=p.c;
+    if(p.shape==="rect") cctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);
+    else if(p.shape==="star"){
+      cctx.beginPath();
+      for(let k=0;k<5;k++){ const a=-Math.PI/2+k*TAU/5,a2=a+TAU/10;
+        cctx.lineTo(Math.cos(a)*p.s*0.6,Math.sin(a)*p.s*0.6);
+        cctx.lineTo(Math.cos(a2)*p.s*0.28,Math.sin(a2)*p.s*0.28);}
+      cctx.closePath(); cctx.fill();
+    }
+    else { cctx.beginPath(); cctx.arc(0,0,p.s/2,0,TAU); cctx.fill(); }
+    cctx.restore();
+  }
+}
+
+/* ============================================================
+   UI レンダリング
+============================================================ */
+function renderMembers(){
+  const list=document.getElementById("memberList");
+  list.innerHTML="";
+  state.members.forEach((name,idx)=>{
+    const wonLabel = winnerAwardLabel(name.trim());
+    const row=document.createElement("div");
+    row.className="member-row" + (wonLabel ? " won" : "");
+    row.innerHTML =
+      '<span class="num">'+(idx+1)+'</span>'+
+      '<input type="text" value="'+escapeAttr(name)+'" placeholder="名前を入力"'+(wonLabel?' readonly':'')+'>'+
+      (wonLabel ? '<span class="won-badge">🏆 '+escapeHtml(wonLabel)+'当選</span>' : '')+
+      '<button class="icon-btn" title="削除" type="button">×</button>';
+    const input=row.querySelector("input");
+    if(!wonLabel){
+      input.addEventListener("input",e=>{ state.members[idx]=e.target.value; updateCount(); });
+    }
+    row.querySelector(".icon-btn").addEventListener("click",()=>{
+      state.members.splice(idx,1); renderMembers();
+    });
+    list.appendChild(row);
+  });
+  updateCount();
+}
+function updateCount(){
+  document.getElementById("memberCount").textContent = activeMembers().length;
+  document.getElementById("addBtn").disabled = state.members.length>=MAX_MEMBERS;
+  syncWheel();
+}
+function renderWinners(){
+  const strip=document.getElementById("winnersStrip");
+  strip.innerHTML="";
+  const medals=["🥇","🥈","🥉"];
+  const a=award(); const wn=a.winners; const need=winnersNeeded();
+  for(let i=0;i<need;i++){
+    const chip=document.createElement("div");
+    const prize=prizeForSlot(a,i);
+    if(wn[i]){
+      chip.className="winner-chip";
+      chip.innerHTML='<span class="medal">'+(medals[i]||"🎖️")+'</span>'+escapeHtml(wn[i])+' さん'
+        + prizeImageHTML(prize,"xs");
+      chip.title=prize.name;
+    }else{
+      chip.className="winner-chip placeholder";
+      chip.textContent = need===1 ? "当選者：未定" : (i+1)+"人目：未定";
+    }
+    strip.appendChild(chip);
+  }
+}
+// 設定パネルの賞品カード
+function renderPrizeCard(){
+  const a=award();
+  // 同じ賞品をまとめて数える
+  const groups=[];
+  a.prizes.forEach(p=>{ const g=groups.find(x=>x.p.key===p.key); if(g)g.n++; else groups.push({p,n:1}); });
+  let html='<div class="pc-head">🎁 '+escapeHtml(a.label)+' の賞品</div>';
+  groups.forEach(g=>{
+    html+='<div class="prize-item">'+prizeImageHTML(g.p,"sm")+
+      '<div class="prize-meta"><div class="prize-name">'+escapeHtml(g.p.name)+
+      (g.n>1?'<span class="prize-qty">×'+g.n+'</span>':'')+'</div>'+
+      (g.p.url?'<a class="prize-link" href="'+escapeAttr(g.p.url)+'" target="_blank" rel="noopener">商品ページ ↗</a>':'')+
+      '</div></div>';
+  });
+  document.getElementById("prizeCard").innerHTML=html;
+}
+// 「今回の賞品」バナー
+function renderPrizeBanner(){
+  const a=award(); const idx=a.winners.length; const banner=document.getElementById("prizeBanner");
+  if(idx>=a.count){
+    banner.className="prize-banner done";
+    banner.innerHTML='<span class="pb-label">この賞は終了しました 🎉</span>';
+    return;
+  }
+  const prize=prizeForSlot(a,idx);
+  banner.className="prize-banner";
+  const labelTxt = a.count>1 ? ("今回の賞品（"+(idx+1)+"/"+a.count+"名目）") : "今回の賞品";
+  banner.innerHTML=prizeImageHTML(prize,"sm")+
+    '<div><div class="pb-label">'+labelTxt+'</div><div class="pb-name">'+escapeHtml(prize.name)+'</div></div>';
+}
+function renderAward(){
+  document.getElementById("awardTitle").textContent = awardLabel()+" ルーレット（当選"+winnersNeeded()+"名）";
+  document.getElementById("modalRibbon").textContent = awardLabel();
+  document.querySelectorAll(".mode-btn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.mode===state.mode);
+  });
+  renderPrizeCard();
+  renderPrizeBanner();
+  renderWinners();
+  refreshStartBtn();
+  syncWheel();
+}
+function refreshStartBtn(){
+  const btn=document.getElementById("startBtn");
+  const done = award().winners.length>=winnersNeeded();
+  btn.disabled = done || state.phase!=="idle";
+  if(done){ note(awardLabel()+"の当選者"+winnersNeeded()+"名が決定しました🎉"); }
+}
+
+function setControls(enabled){
+  document.getElementById("startBtn").disabled = !enabled || award().winners.length>=winnersNeeded();
+  document.getElementById("addBtn").disabled = !enabled || state.members.length>=MAX_MEMBERS;
+  document.querySelectorAll(".mode-btn").forEach(b=>b.disabled=!enabled);
+}
+function note(msg){ document.getElementById("stageNote").textContent=msg; }
+function shakePanel(){
+  const m=document.getElementById("memberList");
+  m.animate([{transform:"translateX(0)"},{transform:"translateX(-6px)"},
+    {transform:"translateX(6px)"},{transform:"translateX(0)"}],{duration:300});
+}
+
+/* モーダル */
+function showModal(name){
+  const a=award();
+  const prize=prizeForSlot(a, a.winners.length-1);   // 直前に確定した当選者の賞品
+  document.getElementById("modalName").innerHTML = escapeHtml(name)+' <small>さん</small>';
+  document.getElementById("modalSub").textContent = awardPersonName() ? (awardPersonName()+" より贈呈") : "";
+  document.getElementById("modalPrize").innerHTML =
+    prizeImageHTML(prize,"lg") + '<div class="mp-name">🎁 '+escapeHtml(prize.name)+'</div>';
+  document.getElementById("overlay").classList.add("show");
+}
+function closeModal(){
+  document.getElementById("overlay").classList.remove("show");
+  state.phase="idle";
+  syncWheel();            // 当選者を盤から外して次の抽選対象に更新
+  renderPrizeBanner();    // 次の賞品に進める
+  setControls(true);
+  refreshStartBtn();
+}
+
+/* ============================================================
+   イベント
+============================================================ */
+document.querySelectorAll(".mode-btn").forEach(b=>{
+  b.addEventListener("click",()=>{
+    if(state.phase!=="idle") return;
+    state.mode=b.dataset.mode;
+    renderAward();
+    note("ボタンを押すとルーレットが回ります");
+  });
+});
+document.getElementById("addBtn").addEventListener("click",()=>{
+  if(state.members.length>=MAX_MEMBERS) return;
+  state.members.push(""); renderMembers();
+  const inputs=document.querySelectorAll("#memberList input");
+  if(inputs.length) inputs[inputs.length-1].focus();
+});
+document.getElementById("startBtn").addEventListener("click",startDraw);
+document.getElementById("modalOk").addEventListener("click",closeModal);
+document.getElementById("overlay").addEventListener("click",e=>{
+  if(e.target.id==="overlay") closeModal();
+});
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  if(state.phase!=="idle") return;
+  award().winners=[];
+  renderAward();
+  renderMembers();      // 一覧の当選バッジも外す
+  note(awardLabel()+"の当選者をリセットしました");
+});
+
+document.getElementById("bgmBtn").addEventListener("click",function(){
+  const on=!this.classList.contains("on");
+  this.classList.toggle("on",on);
+  this.textContent= on ? "🎵 BGM ON" : "🎵 BGM OFF";
+  Sound.resume(); Sound.setBgm(on);
+});
+document.getElementById("sfxBtn").addEventListener("click",function(){
+  const on=!this.classList.contains("on");
+  this.classList.toggle("on",on);
+  this.textContent= on ? "🔊 効果音 ON" : "🔊 効果音 OFF";
+  Sound.setSfx(on);
+});
+
+window.addEventListener("resize",()=>{ resize(); sizeConfetti(); });
+
+/* 賞品画像URL欄（任意） */
+function buildPrizeImgInputs(){
+  const box=document.getElementById("prizeImgInputs");
+  const order=[PR.bakune,PR.anker,PR.jtb,PR.massage,PR.plush];
+  box.innerHTML="";
+  order.forEach(p=>{
+    const row=document.createElement("div"); row.className="pu-row";
+    row.innerHTML='<label>'+escapeHtml(p.short)+'</label>'+
+      '<input type="url" placeholder="画像URL（https://...）" value="'+escapeAttr(state.prizeImg[p.key]||"")+'">';
+    row.querySelector("input").addEventListener("input",e=>{
+      state.prizeImg[p.key]=e.target.value;
+      renderPrizeCard(); renderPrizeBanner(); renderWinners();
+    });
+    box.appendChild(row);
+  });
+}
+
+/* spinning の進行はフレームから駆動 */
+function boot(){
+  resize(); sizeConfetti();
+  buildPrizeImgInputs();
+  renderMembers();
+  renderAward();
+  requestAnimationFrame(function run(t){
+    if(state.phase==="spinning") spinningTick(t);
+    drawAll(t);
+    requestAnimationFrame(run);
+  });
+}
+
+/* frame() を分離して描画専用に */
+function drawAll(time){
+  ctx.clearRect(0,0,W,H);
+  drawScene(time);
+  const list = state.wheelList; const N=list.length;
+  for(let i=0;i<N;i++){
+    const a=(i/N)*TAU - Math.PI/2 + wheelAngle;   // 家は時計回り
+    const x=cx+HOUSE_R*Math.cos(a), y=cy+HOUSE_R*Math.sin(a);
+    const kind = (state.phase==="celebrate" && i===winningIndex) ? "winning" : "normal";
+    drawHouse(x,y,list[i],kind);
+  }
+  drawPointer();
+  drawMarquee(time);
+
+  // 当選した家から放射する光ビーム（celebrate）
+  if(state.phase==="celebrate"){
+    drawBeams(flyTX, flyTY, time, 150, 0.16);
+  }
+
+  if(state.phase==="idle"){
+    // 待機中：海でゆらゆら、ゆっくり揺れる
+    const bob = Math.sin(time/500)*4;
+    const rock = Math.sin(time/650)*0.12;
+    drawSurfer(cx, cy+bob, rock, 1.0);
+  }
+  if(state.phase==="spinning"){
+    // ボードごと反時計回りに回転（家とは逆向き）
+    const bob = Math.sin(time/120)*2;
+    // 回転で散る火花
+    const a=Math.random()*TAU, r=120+Math.random()*72;
+    spawnSparkle(cx+r*Math.cos(a), cy+r*Math.sin(a), 4, 1.6, ["#fff","#ffe27a","#bff0ff"]);
+    drawSurfer(cx, cy+bob, -swingAngle, 1.0);
+  }
+  if(state.phase==="flying"){
+    // 反時計回りに回転しながら、止まった当選者の家へ波に乗って到着
+    const t=Math.min(1,(time-flyStart)/1000);
+    const e=easeOutQuart(t);
+    const sx=lerp(cx, flyTX, e);
+    const sy=lerp(cy, flyTY, e) - Math.sin(t*Math.PI)*64;
+    spawnSparkle(sx, sy, 6, 1.4, SPARK_GOLD);   // 飛行の尾
+    // 着地時はボードが水平になるよう、回転を-TAUの倍数で止める
+    const spinTargetMag = Math.ceil((flySpinStart+1.5*TAU)/TAU)*TAU;
+    const rot = lerp(-flySpinStart, -spinTargetMag, e);
+    drawSurfer(sx, sy, rot, lerp(1.0,1.12,e));
+    if(t>=1) enterCelebrate();
+  }
+  if(state.phase==="celebrate"){
+    // 当選者の家の前で待機（ゆれる）＋ときどき星
+    const sy = flyTY - 4 + Math.sin(time/160)*3;
+    drawSurfer(flyTX, sy, 0, 0.9);
+    if(Math.random()<0.4) spawnSparkle(flyTX,flyTY-20,30,2.4,SPARK_GOLD);
+  }
+
+  drawSparkles();
+  updateConfetti();
+}
+
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function escapeAttr(s){return escapeHtml(s);}
+
+boot();
+})();
+</script>
+</body>
+</html>
